@@ -196,12 +196,9 @@
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             
-            // FAKTA KUNCI: 1 Januari 2024 = Senin Pahing
             const pasaran = ['Wage', 'Kliwon', 'Legi', 'Pahing', 'Pon'];
             const refDate = new Date(2024, 0, 1); 
             const diffDays = Math.floor((now - refDate) / (1000 * 60 * 60 * 24));
-            
-            // Offset +3 karena Pahing berada di index ke-3 pada array di atas
             const pasaranIndex = (diffDays + 3) % 5;
             
             const dayName = days[now.getDay()];
@@ -215,6 +212,23 @@
         }
         setInterval(updateClock, 1000);
         updateClock();
+        
+        // FUNGSI FORMAT HARGA OTOMATIS (Rp dan Titik Ribuan)
+        function formatHarga(harga) {
+            if (!harga) return '';
+            
+            // Hapus semua karakter kecuali angka
+            let angka = harga.toString().replace(/[^0-9]/g, '');
+            
+            // Jika tidak ada angka, kembalikan original
+            if (!angka) return harga;
+            
+            // Tambahkan titik pemisah ribuan
+            let formatted = angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            
+            // Tambahkan "Rp" di depan
+            return 'Rp ' + formatted;
+        }
         
         const API_URL = 'https://script.google.com/macros/s/AKfycbyyzGreg2n1F5CT55STG9yurFO-R_NcrAUnQvbc8Xk55iQGcYlaFDyj8yDEsKZCi2qE/exec';
         let products = [];
@@ -238,22 +252,6 @@
             ).join('');
         }
         
-        function formatHarga(harga) {
-    if (!harga) return '';
-    
-    // Hapus semua karakter kecuali angka dan koma
-    let angka = harga.toString().replace(/[^0-9]/g, '');
-    
-    // Jika tidak ada angka, kembalikan original
-    if (!angka) return harga;
-    
-    // Tambahkan titik pemisah ribuan
-    let formatted = angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    
-    // Tambahkan "Rp" di depan
-    return 'Rp ' + formatted;
-}
-        
         function renderProducts() {
             const search = document.getElementById('searchInput').value.toLowerCase();
             const filtered = products.filter(p => 
@@ -276,7 +274,10 @@
                         <span class="card-cat">${p.kategori || 'Umum'}</span>
                         <h3 class="card-title">${p.nama}</h3>
                         <p class="card-desc">${p.deskripsi || 'Deskripsi tidak tersedia.'}</p>
-                        <div class="card-price">\${formatHarga(p.harga)}</div>
+                        
+                        <!-- INI YANG DIPERBAIKI: Tanda backslash (\) dihapus agar fungsi berjalan -->
+                        <div class="card-price">${formatHarga(p.harga)}</div>
+                        
                         <div class="card-actions">
                             ${p.shopee ? '<a href="' + p.shopee + '" target="_blank" class="btn-buy btn-shopee">🛒 Shopee</a>' : ''}
                             ${p.tiktok ? '<a href="' + p.tiktok + '" target="_blank" class="btn-buy btn-tiktok">🎵 TikTok</a>' : ''}
