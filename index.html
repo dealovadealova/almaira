@@ -238,6 +238,22 @@
             ).join('');
         }
         
+        function formatHarga(harga) {
+    if (!harga) return '';
+    
+    // Hapus semua karakter kecuali angka dan koma
+    let angka = harga.toString().replace(/[^0-9]/g, '');
+    
+    // Jika tidak ada angka, kembalikan original
+    if (!angka) return harga;
+    
+    // Tambahkan titik pemisah ribuan
+    let formatted = angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    
+    // Tambahkan "Rp" di depan
+    return 'Rp ' + formatted;
+}
+        
         function renderProducts() {
             const search = document.getElementById('searchInput').value.toLowerCase();
             const filtered = products.filter(p => 
@@ -260,7 +276,7 @@
                         <span class="card-cat">${p.kategori || 'Umum'}</span>
                         <h3 class="card-title">${p.nama}</h3>
                         <p class="card-desc">${p.deskripsi || 'Deskripsi tidak tersedia.'}</p>
-                        <div class="card-price">${p.harga}</div>
+                        <div class="card-price">\${formatHarga(p.harga)}</div>
                         <div class="card-actions">
                             ${p.shopee ? '<a href="' + p.shopee + '" target="_blank" class="btn-buy btn-shopee">🛒 Shopee</a>' : ''}
                             ${p.tiktok ? '<a href="' + p.tiktok + '" target="_blank" class="btn-buy btn-tiktok">🎵 TikTok</a>' : ''}
